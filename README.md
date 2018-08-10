@@ -13,11 +13,11 @@ Next edit the fcm.html file, in the script section, to set the config var based 
 
 At this point, the system should be ready to use. Build it as a WAR, run it on Tomcat, and go to it in your browser.
 
-View the console and you will see that the ServiceWorker is receiving the messages that are being sent by the scheduled method on the server. This all works on localhost.
+View the console and you will see that the ServiceWorker is receiving the messages that are being sent by the scheduled method on the server. This all works on localhost. It also all works from a non-root context if desired.
 
 # ServiceWorker instead of firebase-messaging-sw.js
 
-What's different about this project? Most projects using Firebase Cloud Messaging use a magic file called called firebase-messaging-sw.js, which must be in the root path. The documentation says you can use messaging.useServiceWorker(ServiceWorkerRegistration) but doesn't show  examples of how. This project is a minimalist complete demonstration of how it all works.
+What's different about this project? Most projects using Firebase Cloud Messaging use a magic file called called firebase-messaging-sw.js, which must be in the root path. The documentation says you can use messaging.useServiceWorker(ServiceWorkerRegistration) but doesn't show  examples of how. This project is a minimalist complete demonstration of how it all works. Google's documentation isn't clear on the necessity of firebase-messaging-sw.js, or how to use a ServiceWorker to avoid needing firebase-messaging-sw.js. This example shows clearly how to do that, without much other code and no frameworks.
 
 # Next
 
@@ -27,4 +27,8 @@ This example sends a message every 10 seconds. Real applications should not anno
 
 # Not a complete project
 
-This project does almost no error checking. It's greatly simplified to show the minimum code needed to send messages from a Java web server to JavaScript clients by FCM.
+This project does almost no error checking. It's greatly simplified to show the minimum code needed to send messages from a Java web server to JavaScript clients by FCM. Errors occur when a client token is removed, and sending a message throws an exception. Also the user might not allow notifications, which also should stop the process of trying to send a token. 
+
+The server needs to get the cient's token to be able to address the client. For that, we have the client send a simple POST to a controller which keeps a Set of tokens. This is greatly simplified from what a deployed system would do.
+
+FCM allows sending broadcasts to topics, but broadcast to a topic can't be received on JavaScript clients. JavaScript clients must be addressed individually, by token.
