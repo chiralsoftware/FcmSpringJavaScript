@@ -1,0 +1,65 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>JavaScript Firebase Cloud Messaging (FCM) client</title>
+        <link rel="manifest" href="manifest.json"/>
+
+        <link rel="stylesheet" href="style.css"/>
+        <script src="//code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase.js"></script>
+
+    </head>
+    <body>
+        <h1>JavaScript Firebase Cloud Messaging (FCM) client</h1>
+
+        <p>
+            This page uses FCM to messages
+        </p>
+
+        <hr/>
+
+        <h2 id="message">message loading</h2>
+
+        <script>
+            $("#message").text("initializing service worker");
+
+            // Initialize Firebase
+            var config = {
+                apiKey: "XXXXXXXX",
+                authDomain: "XXXX.firebaseapp.com",
+                databaseURL: "https://XXX",
+                projectId: "XXXXX-1",
+                storageBucket: "XXXXXX.appspot.com",
+                messagingSenderId: "XXXXXXXX"
+            };
+            firebase.initializeApp(config);
+
+            const messaging = firebase.messaging();
+            navigator.serviceWorker.register("service-worker.js").
+                    then((registration) => {
+                        messaging.useServiceWorker(registration);
+                    }).then(() => {
+                messaging.requestPermission()
+                        .then(() => {
+                            messaging.getToken()
+                                    .then(currentToken => {
+                                        console.log("Here is the token: " + currentToken);
+                                $.ajax({
+                                    url:"./fcm/register",
+                                    dataType: "text",
+                                    data: { "token": currentToken },
+                                    type: "POST"
+                                });
+                                console.log("sending the post");
+                                    })
+                        });
+            });
+
+            $("#message").text("ready to receive messages");
+        </script>
+
+        <hr/>
+
+        <a href="./">back</a>
+    </body>
+</html>

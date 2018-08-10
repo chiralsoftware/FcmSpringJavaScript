@@ -1,0 +1,8 @@
+/* Simple style for the page */
+
+* {
+    font-family: sans-serif;
+}
+html {
+    background-color: aliceblue;
+}
