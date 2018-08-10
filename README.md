@@ -24,3 +24,7 @@ What's different about this project? Most projects using Firebase Cloud Messagin
 The Service Worker receives the notification in the push event, and shows it on the console, but doesn't do anything else with it. Real applications will either do something in the background or show a notification to the user. Many other articles show how to do those things.
 
 This example sends a message every 10 seconds. Real applications should not annoy users with notifications so often, although if the window is in the foreground, something like a chat app could display notifications that quickly.
+
+# Not a complete project
+
+This project does almost no error checking. It's greatly simplified to show the minimum code needed to send messages from a Java web server to JavaScript clients by FCM.
