@@ -6,7 +6,14 @@
 
         <link rel="stylesheet" href="style.css"/>
         <script src="//code.jquery.com/jquery-3.3.1.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase.js"></script>
+        <!-- Include the individual firebase components to avoid getting the warning on
+        console. I'm not sure if we actually need all of these just for messaging. -->
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-messaging.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.3.1/firebase-storage.js"></script>
 
     </head>
     <body>
@@ -21,10 +28,13 @@
         <h2 id="message">message loading</h2>
 
         <script>
+            // Script to initialize firebase and receive messages.
+            // In a real application this would be in a separate JavaScript file.
+            
             $("#message").text("initializing service worker");
 
             // Initialize Firebase
-            var config = {
+            let config = {
                 apiKey: "XXXXXXXX",
                 authDomain: "XXXX.firebaseapp.com",
                 databaseURL: "https://XXX",
@@ -35,27 +45,40 @@
             firebase.initializeApp(config);
 
             const messaging = firebase.messaging();
-            navigator.serviceWorker.register("service-worker.js").
-                    then((registration) => {
-                        messaging.useServiceWorker(registration);
-                    }).then(() => {
-                messaging.requestPermission()
-                        .then(() => {
-                            messaging.getToken()
-                                    .then(currentToken => {
-                                        console.log("Here is the token: " + currentToken);
-                                $.ajax({
-                                    url:"./fcm/register",
-                                    dataType: "text",
-                                    data: { "token": currentToken },
-                                    type: "POST"
-                                });
-                                console.log("sending the post");
-                                    })
-                        });
-            });
-
-            $("#message").text("ready to receive messages");
+            
+            navigator.serviceWorker.register("service-worker.js")
+                .then(registration => {
+                    messaging.useServiceWorker(registration);
+                    return messaging.requestPermission();
+                })
+                .then(() => {
+                    return messaging.getToken();
+                })
+                .then(currentToken => {
+                    console.log("Here is the token: " + currentToken);
+            
+                    $.ajax({
+                        url:"./fcm/register",
+                        dataType: "text",
+                        data: { "token": currentToken },
+                        type: "POST",
+                        success: function( data ) {
+                            if (data === "OK") {
+                                console.log("FCM RESULT: " + data);
+                                $("#message").text("ready to receive messages");
+                            } else {
+                                console.log("FCM ERROR " + data);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                           console.log("ERROR: " + xhr.responseText);
+                       }
+                    });         
+                    
+                })
+                .catch((err) => {
+                    console.log(err.stack);
+                });
         </script>
 
         <hr/>
