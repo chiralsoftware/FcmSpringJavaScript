@@ -3,16 +3,14 @@ package chiralsoftware.fcmspringjavascript.controllers;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  *
  */
-@Controller
+@RestController
 @RequestMapping("/fcm")
 public class FcmRegister {
 
@@ -23,8 +21,7 @@ public class FcmRegister {
     public static final Set<String> tokens = new HashSet<>();
     
     @PostMapping("/register")
-    @ResponseBody
-    public String register(@RequestParam String token) {
+    public String register(String token) {
         LOG.info("this is the token: " + token);
         if(token.length() != 152) {
             LOG.info("Invalid token, must be 152 chars: " + token);
