@@ -3,7 +3,7 @@ package chiralsoftware.fcmspringjavascript;
 import static chiralsoftware.fcmspringjavascript.controllers.FcmRegister.tokens;
 import static com.google.auth.oauth2.GoogleCredentials.fromStream;
 import static com.google.firebase.FirebaseApp.initializeApp;
-import static com.google.firebase.FirebaseOptions.Builder;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.util.Date;
 import java.util.Random;
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 import javax.annotation.PostConstruct;
@@ -30,13 +31,17 @@ public class FcmConfig {
     private final Random random = new Random();
 
     @PostConstruct
-    public void configure() throws Exception {
+    public void configure() {
         LOG.info("I'm configuring FCM now");
-
-        initializeApp(new Builder()
-                .setCredentials(fromStream(new FileInputStream(path)))
-                .setDatabaseUrl("https://XXXXXXXX.firebaseio.com")
-                .build());
+        
+        try {
+            initializeApp(FirebaseOptions.builder()
+                    .setCredentials(fromStream(new FileInputStream(path)))
+                    .setDatabaseUrl("https://XXXXXXXX.firebaseio.com")
+                    .build());
+        } catch(Exception e) {
+            LOG.log(WARNING, "Couldn't initialize firebase", e);
+        }
         LOG.info("I did the initliazation");
     }
 
